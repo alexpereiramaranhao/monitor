@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -49,15 +50,26 @@ func montarMenu() {
 }
 
 func iniciarMonitoramento() {
-	site := "https://random-status-code.herokuapp.com/"
+	sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br", "https://www.google.com"}
 
+	for i := 0; i < 5; i++ {
+		for _, site := range sites {
+			testarSite(site)
+		}
+
+		time.Sleep(2 * time.Second)
+	}
+
+}
+
+func testarSite(site string) {
 	response, _ := http.Get(site)
 
 	statusCode := response.StatusCode
 
 	if statusCode == 200 {
-		fmt.Println("Status ok:", statusCode)
+		fmt.Println(site, "- status ok:", statusCode)
 	} else {
-		fmt.Println("Erro:", statusCode)
+		fmt.Println(site, " - erro:", statusCode)
 	}
 }
