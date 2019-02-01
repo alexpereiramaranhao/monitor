@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
+
+const MONITORAMENTOS = 5
+const DELAY = 2
 
 func main() {
 	versao := 1.1
@@ -50,20 +56,26 @@ func montarMenu() {
 }
 
 func iniciarMonitoramento() {
-	sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br", "https://www.google.com"}
+	sites := lerArquivo()
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < MONITORAMENTOS; i++ {
 		for _, site := range sites {
 			testarSite(site)
 		}
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(DELAY * time.Second)
 	}
 
 }
 
 func testarSite(site string) {
-	response, _ := http.Get(site)
+	response, err := http.Get(site)
+
+	if err != nil {
+		fmt.Println("Erro ao testar o site. ", err)
+
+		return
+	}
 
 	statusCode := response.StatusCode
 
@@ -72,4 +84,34 @@ func testarSite(site string) {
 	} else {
 		fmt.Println(site, " - erro:", statusCode)
 	}
+}
+
+func lerArquivo() []string {
+	var sites []string
+
+	arquivo, err := os.Open("sites.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro ao ler o arquivo:", err)
+		return nil
+	}
+
+	leitor := bufio.NewReader(arquivo)
+
+	for {
+		linha, err := leitor.ReadString('\n')
+		linha = strings.TrimSpace(linha)
+
+		if err == io.EOF {
+			break
+		}
+
+		sites = append(sites, linha)
+	}
+
+	arquivo.Close()
+
+	fmt.Println(sites)
+
+	return sites
 }
