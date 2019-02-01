@@ -10,8 +10,12 @@ import (
 	"time"
 )
 
-const MONITORAMENTOS = 5
-const DELAY = 2
+// Controle do monitoramento
+const (
+	MONITORAMENTOS = 5
+
+	DELAY = 2
+)
 
 func main() {
 	versao := 1.1
